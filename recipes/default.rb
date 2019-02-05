@@ -15,3 +15,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+ohai_plugin 'exceptions' do
+  resource :template
+end
+
+sysctl 'net.ipv6.conf.all.disable_ipv6' do
+  value 1
+  # Feature-flag to skip resource if exception is in place.
+  not_if { node['exceptions']['ipv6'] }
+end
+
+sysctl 'net.ipv6.conf.default.disable_ipv6' do
+  value 1
+  not_if { node['exceptions']['ipv6'] }
+end
+
+include_recipe 'ntp' unless node['exceptions']['ntp']
